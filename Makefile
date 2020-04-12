@@ -13,3 +13,6 @@ dist/glcube.exe:
 windows: dist/glcube.exe
 macos: dist/glcube.app
 linux: dist/glcube
+
+clean:
+	rm -rf ./__pycache__ ./build ./dist ./*.spec
