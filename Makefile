@@ -7,9 +7,9 @@ dist/glcube:
 dist/glcube.exe:
 	pyinstaller -w -F glcube.py
 
-windows: dist/glcube.exe
-macos: dist/glcube.app
-linux: dist/glcube
+windows: clean dist/glcube.exe
+macos: clean dist/glcube.app
+linux: clean dist/glcube
 
 clean:
 	rm -rf ./__pycache__ ./build ./dist ./*.spec
