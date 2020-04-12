@@ -44,6 +44,8 @@ CUBE_COLORS = (
     (1, 0, 1), (1, 1, 1), (0, 0, 1), (0, 1, 1)
 )
 
+# connect together points for each face
+# face 1 connects points 0,1,2,3 etc
 CUBE_QUAD_VERTS = (
     (0, 1, 2, 3), (3, 2, 7, 6), (6, 7, 5, 4),
     (4, 5, 1, 0), (1, 5, 7, 2), (4, 0, 3, 6)
@@ -55,6 +57,8 @@ CUBE_EDGES = (
 )
 
 fullscreen = False
+outlines = True
+fullscreen_res = None # set in main()
 windowed_res = (640,480)
 current_res = windowed_res
 fov = 45.0
@@ -86,13 +90,13 @@ def init_gl_stuff():
             100.0 # zFar, the far clipping plane, don't render things beyond this
     )
     # move the camera back three units
-    glTranslatef(0.0, 0.0, -3.0)
+    glTranslatef(0.0, 0.0, -5.0)
     # orbit higher to view the subject at a better angle
-    glRotatef(25, 1, 0, 0)                       #orbit higher
+    glRotatef(25, 1, 0, 0)
 
 
 
-def drawcube():
+def drawcube(offset=0):
     "draw the cube"
     allpoints = list(zip(CUBE_POINTS, CUBE_COLORS))
 
@@ -101,28 +105,28 @@ def drawcube():
         for vert in face:
             pos, color = allpoints[vert]
             glColor3fv(color)
-            glVertex3fv(pos)
+            glVertex3fv(tuple(x+offset for x in pos))
     glEnd()
 
-    glColor3f(0.0, 0.0, 0.0)
-    glBegin(GL_LINES)
-    for line in CUBE_EDGES:
-        for vert in line:
-            pos, color = allpoints[vert]
-            glVertex3fv(pos)
-
-    glEnd()
+    if outlines:
+        glColor3f(0.0, 0.0, 0.0)
+        glBegin(GL_LINES)
+        for line in CUBE_EDGES:
+            for vert in line:
+                pos, color = allpoints[vert]
+                glVertex3fv(tuple(x+offset for x in pos))
+    
+        glEnd()
 
 
 def toggle_fullscreen():
     global fullscreen, windowed_res, current_res
     if not fullscreen:
-        print("Changing to FULLSCREEN")
-        display_info = pygame.display.Info()
-        current_res = (display_info.current_w, display_info.current_h)
+        print("Changing to FULLSCREEN {}x{}".format(*fullscreen_res))
+        current_res = fullscreen_res
         pygame.display.set_mode(current_res, OPENGL | DOUBLEBUF | FULLSCREEN)
     else:
-        print("Changing to windowed mode")
+        print("Changing to windowed mode {}x{}".format(*windowed_res))
         current_res = windowed_res
         pygame.display.set_mode(windowed_res, OPENGL | DOUBLEBUF)
     fullscreen = not fullscreen
@@ -131,16 +135,19 @@ def toggle_fullscreen():
 
 def main():
     "run the demo"
-    global fullscreen, windowed_res, fov
+    global fullscreen, fullscreen_res, windowed_res, fov, outlines
     #initialize pygame and setup an opengl display
     pygame.init()
+
+    display_info = pygame.display.Info()
+    fullscreen_res = (display_info.current_w, display_info.current_h)
 
     pygame.display.set_mode(windowed_res, OPENGL | DOUBLEBUF)
 
     init_gl_stuff()
 
     going = True
-    speed,x,z = 0,0,0
+    speed,x,z,offset,second_cube = 0,0,0,0.5,False
     while going:
         #check for quit'n events
         events = pygame.event.get()
@@ -157,16 +164,21 @@ def main():
                     toggle_fullscreen()
                 if event.key == K_RIGHT:
                     speed += 1
+                    print(speed,x,z,fov)
                 if event.key == K_LEFT:
                     speed -= 1
+                    print(speed,x,z,fov)
                 if event.key == K_UP:
                     x += 1
+                    print(speed,x,z,fov)
                     if not speed: speed = 1
                 if event.key == K_DOWN:
                     x -= 1
+                    print(speed,x,z,fov)
                     if not speed: speed = 1
                 if event.key == pygame.K_r:
                     speed,x,z = 0,0,0
+                    print(speed,x,z)
                     init_gl_stuff()
                 if event.key == pygame.K_w:
                     fov += -1
@@ -174,6 +186,18 @@ def main():
                 if event.key == pygame.K_s:
                     fov -= -1
                     init_gl_stuff()
+                if event.key == pygame.K_o:
+                    outlines = not outlines
+                if event.key == pygame.K_z:
+                    outlines = False
+                    speed,x,y,fov = 2,1,0,8.0
+                    init_gl_stuff()
+                if event.key == pygame.K_a:
+                    second_cube = not second_cube
+                if event.key == pygame.K_d:
+                    offset -= 0.25
+                if event.key == pygame.K_e:
+                    offset += 0.25
 
         #clear screen and move camera
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
@@ -183,6 +207,8 @@ def main():
             glRotatef(speed, x, 1, z)
 
         drawcube()
+        if second_cube:
+            drawcube(offset=offset)
         pygame.display.flip()
         pygame.time.wait(10)
 
