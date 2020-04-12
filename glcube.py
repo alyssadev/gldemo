@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+# https://github.com/pygame/pygame/blob/master/examples/glcube.py
+# LGPL license
+
 """Draw a cube on the screen. every frame we orbit
 the camera around by a small amount and it appears
 the object is spinning. note i've setup some simple
@@ -91,7 +94,7 @@ def main():
     pygame.init()
 
     fullscreen = False
-    pygame.display.set_mode((640,480), OPENGL|DOUBLEBUF)
+    pygame.display.set_mode((640,480), OPENGL | DOUBLEBUF)
 
     init_gl_stuff()
 
@@ -100,14 +103,15 @@ def main():
         #check for quit'n events
         events = pygame.event.get()
         for event in events:
-            if event.type == QUIT or (event.type == KEYDOWN and event.key == K_ESCAPE):
+            if event.type == QUIT or (event.type == KEYDOWN and (event.key == K_ESCAPE or event.key == pygame.K_q)):
                 going = False
 
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_f:
                     if not fullscreen:
                         print("Changing to FULLSCREEN")
-                        pygame.display.set_mode((640, 480), OPENGL | DOUBLEBUF | FULLSCREEN)
+                        display_info = pygame.display.Info()
+                        pygame.display.set_mode((display_info.current_w, display_info.current_h), OPENGL | DOUBLEBUF | FULLSCREEN)
                     else:
                         print("Changing to windowed mode")
                         pygame.display.set_mode((640, 480), OPENGL | DOUBLEBUF)

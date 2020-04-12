@@ -1,8 +1,15 @@
-macos:
+dist/glcube.app:
 	pyinstaller --hidden-import pkg_resources.py2_warn -w glcube.py
+	cd dist
+	zip -r glcube.zip glcube.app
+	cd ..
 
-linux:
+dist/glcube:
 	pyinstaller --hidden-import pkg_resources.py2_warn -F -w glcube.py
 
-windows:
+dist/glcube.exe:
 	pyinstaller -w -F glcube.py
+
+windows: dist/glcube.exe
+macos: dist/glcube.app
+linux: dist/glcube
