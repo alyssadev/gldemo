@@ -10,11 +10,11 @@ hard work for us. :]
 """
 
 import pygame
-from pygame.locals import *
+from pygame.locals import OPENGL, DOUBLEBUF, QUIT, KEYDOWN, K_ESCAPE, KEYDOWN, FULLSCREEN
 
 try:
-    from OpenGL.GL import *
-    from OpenGL.GLU import *
+    from OpenGL.GL import glBegin, glEnable,glColor3f, glColor3fv, glVertex3fv, glEnd, glMatrixMode, glLoadIdentity, glTranslatef, glRotatef, glClear, GL_QUADS, GL_LINES, GL_DEPTH_TEST, GL_PROJECTION, GL_COLOR_BUFFER_BIT, GL_DEPTH_BUFFER_BIT
+    from OpenGL.GLU import gluPerspective
 except ImportError:
     print ('The GLCUBE example requires PyOpenGL')
     raise SystemExit
